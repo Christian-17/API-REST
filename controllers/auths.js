@@ -1,18 +1,19 @@
 const { response } = require("express")
+const bcryptjs = require('bcryptjs')
 const User  = require('../models/usuario');
 const { generarJWT } = require("../helpers/generar-jwt");
 
 
 const comprobacionLogin = async(req, res = response) => {
 
-    const { correo, contraseña } = req.body;
+    const { username, password } = req.body;
 
     try {
 
-        const usuario = await User.findOne({correo});
+        const usuario = await User.findOne({username});
         if (!usuario) {
             return res.status(400).json({
-                msg: `No existe usuario con el correo: ${correo }`
+                msg: `No existe usuario: ${username}`
             })
         }
        
@@ -22,8 +23,8 @@ const comprobacionLogin = async(req, res = response) => {
             })
         }
 
-        const password = await User.findOne({contraseña})
-        if (!password) {
+        const password1 = bcryptjs.compareSync(password, usuario.password)
+        if (!password1) {
             return res.status(400).json({
                 msg: 'contraseña icorrecta'
             })
@@ -33,10 +34,14 @@ const comprobacionLogin = async(req, res = response) => {
 
     res.json({
         usuario,
-        token
+        token,
+        expiresIn: 3 + 'h'
     })
     } catch (error) {
-        
+        console.log(error);
+        return res.status(500).json({
+            msg: 'hable con el administrador'
+        })
     }
 }
 

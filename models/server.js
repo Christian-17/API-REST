@@ -5,6 +5,7 @@ const { dbConnection } = require('../database/config');
 
 const router = require('../routes/usuario');
 const tarea = require('../routes/tarea');
+const papelera = require('../routes/papelera');
 const login = require('../routes/auth');
 
 
@@ -15,9 +16,10 @@ class Server {
         this.app = express()
         this.port = process.env.PORT
         this.path = {
-            usuarios: '/api/usuarios',
+            user: '/api/usuarios',
             auth: '/api/login',
-            tareas: '/api/tareas'
+            tasks: '/api/tareas/',
+            paperBin: '/api/papelera/'
         }
 
         this.conectarDB();
@@ -41,9 +43,10 @@ class Server {
     }
 
     routes() {
-        this.app.use( this.path.usuarios, router );
+        this.app.use( this.path.user, router );
         this.app.use( this.path.auth, login )
-        this.app.use( this.path.tareas, tarea );
+        this.app.use( this.path.tasks, tarea );
+        this.app.use( this.path.paperBin, papelera );
     }
 
     listen() {

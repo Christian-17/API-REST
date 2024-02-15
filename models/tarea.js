@@ -14,6 +14,10 @@ const TareasSchema = Schema({
         type: Boolean,
         default: true
     },
+    completed: {
+        type: Boolean,
+        default: false
+    },
     usuario: {
         type: Schema.Types.ObjectId,
         ref: 'User',

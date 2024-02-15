@@ -1,67 +1,70 @@
 const { response, query } = require("express");
-const Tarea = require('../models/tarea');
+const Tarea = require("../models/tarea");
 
-
-const tareaGet = async(req, res = response, query) => {
-
-  const {usuarioId} = req.params;
+const tareaGet = async (req, res = response, query) => {
+  const usuarioId = req.usuario?._id;
 
   const tarea = await Tarea.find({
     estado: true,
-    usuario: usuarioId
-});
+    usuario: usuarioId,
+  });
 
   res.json({
-      tarea
+    tarea,
   });
-}
+};
 
-const tareaPost = async( req, res = response ) => {
+const tareaPost = async (req, res = response) => {
+  const { nombre, descripcion } = req.body;
+  const data = { nombre, descripcion, usuario: req.usuario._id };
 
-    const { nombre, descripcion } = req.body
+  const tarea = new Tarea(data);
 
-    const data = { nombre, descripcion, usuario: req.usuario._id };
+  await tarea.save(data);
 
-    const tarea = new Tarea(data)
+  res.json({
+    tarea,
+  });
+};
 
-    await tarea.save(data)
+const tareaPut = async (req, res = response) => {
+  const { id } = req.params;
+  const { nombre, descripcion } = req.body;
 
-    res.json({
-        tarea
-    })
-}
+  const tarea = await Tarea.findByIdAndUpdate(
+    id,
+    { nombre, descripcion },
+    { new: true }
+  );
 
-const tareaPut = async(req, res = response) => {
+  res.json({
+    tarea,
+  });
+};
 
-    const { id } = req.params;
-    const { nombre, descripcion } = req.body;
-  
-    const tarea = await Tarea.findByIdAndUpdate(
-      id,
-      { nombre, descripcion },
-      { new: true }
-    );
-  
-    res.json({
-      tarea
-    })
-  }
+const tareaDelete = async (req, res = response) => {
+  const { id } = req.params;
 
-  const tareaDelete = async(req, res = response) => {
+  const tarea = await Tarea.findByIdAndUpdate(id, { estado: false });
 
-    const { id } = req.params
+  res.json({
+    tarea,
+  });
+};
+const tareaCompleted = async (req, res = response) => {
+  const { id } = req.params;
 
-    const tarea = await Tarea.findByIdAndUpdate(id, { estado:false });
-
-    res.json({
-      tarea
-    })
-
-  }
+  const tarea = await Tarea.findByIdAndUpdate(id, { completed: true });
+console.log(tarea);
+  res.json({
+    tarea,
+  });
+};
 
 module.exports = {
-    tareaGet,
-    tareaPost,
-    tareaPut,
-    tareaDelete
-}
+  tareaGet,
+  tareaPost,
+  tareaPut,
+  tareaDelete,
+  tareaCompleted,
+};
